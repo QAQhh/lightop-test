@@ -22,6 +22,7 @@
 #include "lmslimquant_native/hipblaslt/blaslt_w8a8_gemm.hpp"
 #include "lmslimquant_native/hipblaslt/blaslt_w8a8_gemm_v2.hpp"
 #include "sampling/sampling.h"
+#include "sampling/markov_gemv_argmax.h"
 enum GRAD_TYPE {nograd, wgrad, xgrad};
 namespace lightop::dsv41 {
 void ragged_topk_postprocess(const torch::Tensor& scores, const torch::Tensor& selected,
@@ -1437,6 +1438,9 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       py::arg("out"),
       py::arg("input"),
       py::arg("scales"));
+  m.def("markov_gemv_add_argmax", &lightop::sampling::markov_gemv_add_argmax,
+        py::arg("latent"), py::arg("weight"), py::arg("base_logits"),
+        "BF16 rank-256 Markov GEMV + BF16/FP32 logits add + greedy argmax (BS1-4)");
   m.def("top_k_sampling_from_probs", &lightop::sampling::top_k_sampling_from_probs, "top_k_sampling_from_probs");
   m.def("top_p_sampling_from_probs", &lightop::sampling::top_p_sampling_from_probs, "top_p_sampling_from_probs");
   m.def("top_k_top_p_sampling_from_probs", &lightop::sampling::top_k_top_p_sampling_from_probs, "top_k_top_p_sampling_from_probs");
